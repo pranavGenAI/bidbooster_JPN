@@ -54,7 +54,7 @@ def get_conversational_chain():
     provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n. And remember to format your answer in nicer way.
     Do not copy and paste the context. Summarize it in better way and then provide the answer. 
     Context:\n {context}?\n
-    Question: \n{question}\n .Provide summarize answer in Japanese language and format it in better way. Do not copy and paste the RFP context but summarize it.
+    Question: \n{question}\n .Provide summarize answer in Japanese language and format it in better way. Add bullets wherever required. Do not copy and paste the RFP context but summarize it.
 
     Answer:
     """
