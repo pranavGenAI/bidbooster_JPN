@@ -50,11 +50,12 @@ def get_vector_store(text_chunks, api_key):
 
 def get_conversational_chain():
     prompt_template = """
-    Answer the question in Japanese Language as detailed as possible from the provided context and in polite way, make sure to provide all the details in summarized format, if the answer is not in
-    provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n. And remember to format your answer in nicer way.
-    Do not copy and paste the context. Summarize it in better way and then provide the answer. 
-    Context:\n {context}?\n
-    Question: \n{question}\n .Provide summarize answer in Japanese language and format it in better way. Add bullets wherever required. Do not copy and paste the RFP context but summarize it.
+    提供された文脈から可能な限り詳細に、丁寧な方法で日本語で質問に答えてください。答えがそうでない場合は、必ずすべての詳細を要約した形式で提供してください。
+    コンテキストが提供された場合は、「そのコンテキストでは答えがありません」とだけ言うだけで、間違った答えを提供しないでください。そして、回答をより適切な形式にすることを忘れないでください。
+    コンテキストをコピーして貼り付けないでください。より適切な方法で要約してから、答えを提供してください。
+    
+    コンテクスト:\n {context}?\n
+    質問: \n{question}\n .日本語で要約した回答を提供し、より適切な形式で作成してください。必要に応じて箇条書きを追加します。 RFP コンテキストをコピーして貼り付けるのではなく、要約してください。
 
     Answer:
     """
@@ -71,7 +72,7 @@ def user_input(user_question, api_key):
     docs = new_db.similarity_search(user_question)
     chain = get_conversational_chain()
     response = chain({"input_documents": docs, "question": user_question}, return_only_outputs=True)
-    st.write("Reply: ", response["output_text"])
+    st.write("ビッドブースター: ", response["output_text"])
 
 def main():
     st.header("質問してください...")
