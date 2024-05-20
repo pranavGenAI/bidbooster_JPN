@@ -88,7 +88,7 @@ def user_input(user_question, api_key):
 def main():
     st.header("質問してください...")
 
-    user_question = st.text_input("PDFファイルから質問する", key="user_question")
+    user_question = st.text_input("RFPファイルから質問する", key="user_question")
 
     if user_question and api_key:  # Ensure API key and user question are provided
         user_input(user_question, api_key)
@@ -99,7 +99,7 @@ def main():
         st.markdown("")
         
         st.title("ビッドブースター 💬")
-        pdf_docs = st.file_uploader("PDF ファイルをアップロードし、「送信して処理」ボタンをクリックします。", accept_multiple_files=True, key="pdf_uploader")
+        pdf_docs = st.file_uploader("RFP ファイルをアップロードし、「送信して処理」ボタンをクリックします。", accept_multiple_files=True, key="pdf_uploader")
         if st.button("送信して処理する", key="process_button") and api_key:  # Check if API key is provided before processing
             with st.spinner("処理..."):
                 raw_text = get_pdf_text(pdf_docs)
