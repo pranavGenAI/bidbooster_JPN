@@ -91,7 +91,8 @@ def main():
     user_question = st.text_input("RFPファイルから質問する", key="user_question")
 
     if user_question and api_key:  # Ensure API key and user question are provided
-        user_input(user_question, api_key)
+        if st.button("Ask Question"):
+            user_input(user_question, api_key)
 
     with st.sidebar:
         st.image("https://www.vgen.it/wp-content/uploads/2021/04/logo-accenture-ludo.png", width=150)
