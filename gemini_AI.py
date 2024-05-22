@@ -28,7 +28,6 @@ st.markdown("""
         }
 
         .animated-gradient-text_ {
-            font-family: "Graphik Semibold";
             font-size: 42px;
             background: linear-gradient(45deg, rgb(245, 58, 126) 30%, rgb(200, 1, 200) 55%, rgb(197, 45, 243) 20%);
             background-size: 300% 200%;
@@ -49,7 +48,6 @@ st.markdown("""
             }
         
         .animated-gradient-text_ {
-                    font-family: "Graphik Semibold";
                     font-size: 42px;
                     color: #FFF;
                     transition: color 0.5s, text-shadow 0.5s;
@@ -61,8 +59,8 @@ st.markdown("""
 
         
     </style>
-    <p class="animated-gradient-text_"><b>
-        ビッドブースター: 入札プロセスを簡素化します! </b>
+    <p class="animated-gradient-text_">
+        ビッドブースター: 入札プロセスを簡素化します!
     </p>
 """, unsafe_allow_html=True)
 
