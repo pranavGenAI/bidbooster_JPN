@@ -10,6 +10,8 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
 import os
 from langchain_community.vectorstores import FAISS
+import hashlib
+import json
 
 st.set_page_config(page_title="ビッドブースター", layout="wide")
 video_html = """
