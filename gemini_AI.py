@@ -95,6 +95,94 @@ st.markdown("""
 #api_key = st.text_input("Enter your Google API Key:", type="password", key="api_key_input")
 
 api_key = st.secrets['GEMINI_API_KEY']
+
+
+
+# Helper function to hash passwords
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+
+# Define users and hashed passwords for simplicity
+users = {
+    "tomas": hash_password("tomas123"),
+    "admin": hash_password("admin")
+}
+
+
+TOKEN_FILE = "./data/token_counts.json"
+
+
+def read_token_counts():
+    try:
+        with open("./data/token_counts.json", "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+def write_token_counts(token_counts):
+    with open("./data/token_counts.json", "w") as f:
+        json.dump(token_counts, f)
+
+
+def get_token_count(username):
+    token_counts = read_token_counts()
+    return token_counts.get(username, 1000)  # Default to 1000 tokens if not found
+
+def update_token_count(username, count):
+    token_counts = read_token_counts()
+    token_counts[username] = count
+    write_token_counts(token_counts)
+
+
+def login():
+    col1, col2, col3 = st.columns([1, 1, 1])  # Create three columns with equal width
+    with col2:  # Center the input fields in the middle column
+        st.title("Login")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        
+        if st.button("Sign in"):
+            hashed_password = hash_password(password)
+            if username in users and users[username] == hashed_password:
+                token_counts = read_token_counts()
+                tokens_remaining = token_counts.get(username, 500)  # Default to 500 tokens if not found
+                
+                if tokens_remaining > 0:
+                    st.session_state.logged_in = True
+                    st.session_state.username = username
+                    st.session_state.tokens_remaining = tokens_remaining
+                    st.session_state.tokens_consumed = 0
+                    st.success("Logged in successfully!")
+                    st.experimental_rerun()  # Refresh to show logged-in state
+                else:
+                    st.error("No tokens remaining. Please contact support.")
+            else:
+                st.error("Invalid username or password")
+    # Add the footer section
+    col4, col5, col6, col7, col8, col9 = st.columns([1, 1, 1, 1, 1, 1])
+    st.markdown("")
+    st.markdown("")
+    with col7:
+        st.markdown("")
+        st.markdown("")
+        st.markdown("")
+        st.write("**Design & Developed by:**")
+    with col9:
+        st.image("https://lh3.googleusercontent.com/drive-viewer/AKGpiha2TPFebW5deI-uoKPuD2Yoq_4xws137dj4LaFW3APyb_BkQ5NNKtwtH__KDr3E-_KbygMPh3D5VPqZPR5-ymj17acBxJgBLA=s2560", width=150)
+    with col8:
+        st.image("https://lh3.googleusercontent.com/drive-viewer/AKGpihZfq-IzkSSrziXqoQ8r0ypLiLPAQPW245Aq-NP6-90LEExUcBRM0L_mrr30zFXUzzN985zDpKWrcmptsWMF98vGmZjnfeEibg=s2560", width=150)
+
+def logout():
+    # Clear session state on logout
+    st.session_state.logged_in = False
+    del st.session_state.username
+    del st.session_state.tokens_remaining
+    del st.session_state.tokens_consumed
+    st.success("Logged out successfully!")
+    st.experimental_rerun()  # Refresh to show logged-out state
+
+
 def get_pdf_text(pdf_docs):
     text = ""
     for pdf in pdf_docs:
@@ -226,4 +314,18 @@ if __name__ == "__main__":
     }    
 
     </style>''', unsafe_allow_html=True)
-    main()
+    if "logged_in" not in st.session_state:
+        st.session_state.logged_in = False
+    if "tokens_consumed" not in st.session_state:
+        st.session_state.tokens_consumed = 0
+    if "tokens_remaining" not in st.session_state:
+        st.session_state.tokens_remaining = 0
+    
+    if st.session_state.logged_in:
+        st.sidebar.write(f"Welcome, {st.session_state.username}")
+        st.sidebar.write(f"Tokens remaining: {st.session_state.tokens_remaining}")
+        if st.sidebar.button("Logout"):
+            logout()
+        main()
+    else:
+        login()
