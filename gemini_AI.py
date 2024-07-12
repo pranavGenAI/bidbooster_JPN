@@ -105,23 +105,22 @@ def hash_password(password):
 
 # Define users and hashed passwords for simplicity
 users = {
-    "tomas": hash_password("tomas123"),
-    "admin": hash_password("admin")
+    "pranav.baviskar": hash_password("pranav123")
 }
 
 
-TOKEN_FILE = "./data/token_counts.json"
+TOKEN_FILE = "./data/token_counts_jpn.json"
 
 
 def read_token_counts():
     try:
-        with open("./data/token_counts.json", "r") as f:
+        with open("./data/token_counts_jpn.json", "r") as f:
             return json.load(f)
     except FileNotFoundError:
         return {}
 
 def write_token_counts(token_counts):
-    with open("./data/token_counts.json", "w") as f:
+    with open("./data/token_counts_jpn.json", "w") as f:
         json.dump(token_counts, f)
 
 
@@ -221,6 +220,29 @@ def user_input(user_question, api_key):
     chain = get_conversational_chain()
     response = chain({"input_documents": docs, "question": user_question}, return_only_outputs=True)
     st.write("ビッドブースター: ", response["output_text"])
+    num_words = len(response["output_text"].split())
+
+    # Deduct tokens based on number of words
+    token_cost = num_words  # Each word in the response costs 1 token (adjust as needed)
+    
+    # Check if enough tokens are available
+    if st.session_state.tokens_remaining > 0:
+        # Proceed with displaying the response and deducting tokens
+        st.write("Bid Query Bot: ", response["output_text"])
+        st.session_state.tokens_consumed += token_cost  # Deduct tokens based on response length
+        st.session_state.tokens_remaining -= token_cost
+
+        # Update token count in JSON file
+        token_counts = read_token_counts()
+        token_counts[st.session_state.username] = st.session_state.tokens_remaining
+        write_token_counts(token_counts)
+    else:
+        st.warning("You don't have enough tokens. Please contact your administrator.")
+
+    # Display remaining tokens to the user
+    st.sidebar.text(f"Tokens Remaining: {st.session_state.tokens_remaining}")
+
+
 
 def main():
     st.header("質問してください...")
