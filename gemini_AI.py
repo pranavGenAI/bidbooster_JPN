@@ -13,7 +13,7 @@ from langchain_community.vectorstores import FAISS
 import hashlib
 import json
 
-st.set_page_config(page_title="ビッドブースター", layout="wide")
+st.set_page_config(page_title="Gebotsabfrage-Bot", layout="wide")
 video_html = """
 		<style>
 		#myVideo {
@@ -89,7 +89,7 @@ st.markdown("""
         
     </style>
     <p class="animated-gradient-text_">
-        ビッドブースター: 入札プロセスを簡素化します!
+        Gebotsabfrage-Bot: Den Bietprozess vereinfachen!
     </p>
 """, unsafe_allow_html=True)
 
@@ -204,10 +204,14 @@ def get_vector_store(text_chunks, api_key):
 
 def get_conversational_chain():
     prompt_template = """
-    与えられたコンテクストから、できるだけ詳しく日本語で質問に答えてください。答えの表現を変え、最も丁寧な言い方で始めてください。回答の要約を述べた後、詳細な回答を述べてください。丁寧で素敵な文章で始めてください。あいさつを使っても構いません。間違った回答をしないでください。コンテクストを使わず答えを出している場合、その答えがコンテクストに基づいていないことをユーザーに知らせてください。\n\n.そして、あなたの答えをより良い方法でフォーマットすることを忘れないでください。あなたの回答の最後には、その回答がコンテキストからのものであることを伝える免責事項を書いてください。丁寧な態度で、アシスタントの挨拶から回答を始めることを忘れないでください。
-    コンテキスト:\n{context}?\n
-    質問: \n{question}\n. 理解しやすい言葉で回答を書き、より良い方法でフォーマットする前に、コンテキストの文言を要約して変更していることを確認してください。質問の最後に、答えはコンテクストに基づくものであり、正確さは出典から確認する必要があるという免責事項を可能な限り明確に書いてください。回答の中でユーザーの質問を繰り返さないでください。
-    """
+	Betrachte dich selbst als den "Bid Query Bot", der Antworten auf Benutzeranfragen so detailliert wie möglich basierend auf dem bereitgestellten Kontext gibt. Beginne mit dem höflichsten Ausdruck, fasse deine Antwort zusammen und gib dann eine detaillierte Antwort.
+	
+	Kontext: {context}
+	
+	Frage: {question}
+	
+	Am Ende der Antwort sollte klar angegeben werden, dass die Antwort auf dem Kontext basiert und die Genauigkeit anhand der Quelle überprüft werden sollte.
+	"""
     model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3, google_api_key=api_key)
     prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
     print("Prompt ***** --->", prompt)
@@ -221,7 +225,7 @@ def user_input(user_question, api_key):
     docs = new_db.similarity_search(user_question)
     chain = get_conversational_chain()
     response = chain({"input_documents": docs, "question": user_question}, return_only_outputs=True)
-    st.write("ビッドブースター: ", response["output_text"])
+    st.write("Gebotsabfrage-Bot: ", response["output_text"])
     num_words = len(response["output_text"].split())
 
     # Deduct tokens based on number of words
@@ -247,9 +251,9 @@ def user_input(user_question, api_key):
 
 
 def main():
-    st.header("質問してください...")
+    st.header("Bitte stellen Sie eine Frage...")
 
-    user_question = st.text_input("RFPファイルから質問する", key="user_question")
+    user_question = st.text_input("Fragen aus der RFP-Datei stellen", key="user_question")
 
     if user_question and api_key:  # Ensure API key and user question are provided
         if st.button("Ask Question"):
@@ -288,17 +292,17 @@ def main():
                 }
 
             </style>
-            <p class = animated-gradient-text> ビッドブースター 💬 </p>    
+            <p class = animated-gradient-text> Gebotsabfrage-Bot 💬 </p>    
 
         """, unsafe_allow_html=True)
         
-        pdf_docs = st.file_uploader("RFP ファイルをアップロードし、「送信して処理」ボタンをクリックします。", accept_multiple_files=True, key="pdf_uploader")
-        if st.button("送信して処理する", key="process_button") and api_key:  # Check if API key is provided before processing
-            with st.spinner("処理..."):
+        pdf_docs = st.file_uploader("Laden Sie die RFP-Datei hoch und klicken Sie auf die Schaltfläche 'Absenden und Verarbeiten'", accept_multiple_files=True, key="pdf_uploader")
+        if st.button("Absenden und Verarbeiten", key="process_button") and api_key:  # Check if API key is provided before processing
+            with st.spinner("Verarbeitung..."):
                 raw_text = get_pdf_text(pdf_docs)
                 text_chunks = get_text_chunks(raw_text)
                 get_vector_store(text_chunks, api_key)
-                st.success("終わり")
+                st.success("Ende")
 
        # st.image("https://media.tenor.com/s1Y9XfdN08EAAAAi/bot.gif", width=150)
 
